@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>System Terminal</title>
+
+<style>
+    body {
+        margin: 0;
+        background: black;
+        color: #ff2e2e;
+        font-family: monospace;
+        overflow: hidden;
+    }
+
+    .center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 40px;
+        text-shadow: 0 0 10px red;
+        animation: flicker 2s infinite;
+    }
+
+    @keyframes flicker {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+    }
+
+    button {
+        margin-top: 20px;
+        padding: 15px 30px;
+        font-size: 18px;
+        background: black;
+        border: 2px solid red;
+        color: red;
+        cursor: pointer;
+        box-shadow: 0 0 15px red;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        background: red;
+        color: black;
+    }
+
+    #terminal, #ggScreen {
+        display: none;
+        height: 100vh;
+        width: 100vw;
+        text-align: center;
+    }
+
+    .line {
+        margin: 5px 0;
+    }
+
+    .green { color: #00ff99; }
+    .red { color: #ff2e2e; }
+
+    .bar {
+        width: 300px;
+        height: 15px;
+        border: 1px solid red;
+        margin: 10px auto;
+    }
+
+    .fill {
+        height: 100%;
+        width: 0%;
+        background: red;
+        transition: width 0.2s;
+    }
+
+    .bigText {
+        font-size: 80px;
+        color: #ff2e2e;
+        text-shadow: 0 0 20px red;
+        animation: flicker 1.5s infinite;
+    }
+
+    .timer {
+        font-size: 30px;
+        color: #00ff99;
+        margin-top: 20px;
+    }
+
+    /* ✅ NEW WIN TEXT */
+    .winText {
+        margin-top: 15px;
+        font-size: 22px;
+        color: yellow;
+        text-shadow: 0 0 10px yellow;
+        animation: flicker 1.5s infinite;
+    }
+</style>
+</head>
+
+<body>
+
+<!-- MENU -->
+<div class="center" id="menu">
+    <h1>SYSTEM TERMINAL</h1>
+    <button id="startBtn">START SIMULATION</button>
+</div>
+
+<!-- TERMINAL -->
+<div id="terminal"></div>
+
+<!-- GG SCREEN -->
+<div id="ggScreen" class="center">
+    <div class="bigText">ENCRYPTING FILES</div>
+    <div class="timer" id="timer">10:00</div>
+    <div class="winText">send 0.333 btc to 6g7f8h9gnkv7cvnmnf6</div>
+</div>
+
+<script>
+const btn = document.getElementById("startBtn");
+const terminal = document.getElementById("terminal");
+const menu = document.getElementById("menu");
+const ggScreen = document.getElementById("ggScreen");
+const timerEl = document.getElementById("timer");
+
+function typeLine(text, className = "") {
+    return new Promise(resolve => {
+        const line = document.createElement("div");
+        line.className = "line " + className;
+        terminal.appendChild(line);
+
+        let i = 0;
+        let interval = setInterval(() => {
+            line.textContent += text[i];
+            i++;
+            if (i >= text.length) {
+                clearInterval(interval);
+                resolve();
+            }
+        }, 25);
+    });
+}
+
+function fakeProgress() {
+    return new Promise(resolve => {
+        const bar = document.createElement("div");
+        bar.className = "bar";
+
+        const fill = document.createElement("div");
+        fill.className = "fill";
+
+        bar.appendChild(fill);
+        terminal.appendChild(bar);
+
+        let p = 0;
+        let interval = setInterval(() => {
+            p += 2;
+            fill.style.width = p + "%";
+            if (p >= 100) {
+                clearInterval(interval);
+                resolve();
+            }
+        }, 40);
+    });
+}
+
+function startTimer(duration) {
+    let time = duration;
+
+    const interval = setInterval(() => {
+        let minutes = Math.floor(time / 60);
+        let seconds = time % 60;
+
+        timerEl.textContent =
+            `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+
+        time--;
+
+        if (time < 0) {
+            clearInterval(interval);
+            timerEl.textContent = "00:00";
+        }
+    }, 1000);
+}
+
+async function runSimulation() {
+    menu.style.display = "none";
+    terminal.style.display = "block";
+    terminal.innerHTML = "";
+
+    await typeLine("Initializing secure simulation...", "green");
+    await typeLine("Loading virtual environment...");
+    await fakeProgress();
+
+    await typeLine("Processing fake files...", "red");
+
+    const files = [
+        "file_01.txt",
+        "image_data_23.png",
+        "system_log_a7.bin",
+        "cache_dump.tmp",
+        "user_backup.vxd"
+    ];
+
+    for (let f of files) {
+        await typeLine("Encrypting " + f + " ...", "green");
+    }
+
+    await fakeProgress();
+
+    await typeLine("Simulation complete.");
+    await typeLine("Redirecting...");
+
+    setTimeout(() => {
+        terminal.style.display = "none";
+        ggScreen.style.display = "block";
+        startTimer(10 * 60); // 10 minutes
+    }, 1000);
+}
+
+btn.onclick = runSimulation;
+</script>
+
+</body>
+</html>
